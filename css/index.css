@@ -1,0 +1,96 @@
+body{
+    background-color: whitesmoke;
+    margin: 0;
+}
+
+header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 2rem;
+    background-color: #adadad;
+    color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+video {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.title-container{
+    position: relative;
+    top:-5px;
+    width: fit-content;
+    height: 60px;
+    /* background-color: white; */
+}
+
+.title-holder{
+    height: 60px;
+    font-size: 60px;
+    color: whitesmoke;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+}
+.nav-links a {
+color: white;
+text-decoration: none;
+font-weight: 500;
+transition: color 0.3s;
+}
+.nav-links a:hover {
+color: #101a1a;
+}
+
+.section-wrapper{
+    position: relative;
+    width: 100%;
+    height: max-content;
+}
+.section1{
+    background-color: #e5e5e5;
+}
+
+.section-header{
+    position: relative;
+    width: 100%;
+    height: 60px;
+}
+.section-header-text{
+    text-align: center;
+    font-size: 30px;
+    padding-top:20px;
+    margin: 0px;
+
+    color: #333;
+    font-weight: 600;
+    font-weight: 100;
+    font-family: "Poppins", sans-serif;
+}
+
+.carousel-container{
+    position: relative;
+    max-width: 100%;
+    overflow-x: auto;
+    display: flex;
+    gap: 1rem;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 1rem;
+    
+    /* background-color: #00bcd4; */
+}
+.carousel-slide{
+    flex: 0 0 auto;
+    scroll-snap-align: center;
+    width: 300px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: white;
+}
