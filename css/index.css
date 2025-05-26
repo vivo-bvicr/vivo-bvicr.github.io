@@ -61,7 +61,7 @@ color: #101a1a;
 .section-header{
     position: relative;
     width: 100%;
-    height: 60px;
+    height: fit-content;
 }
 .section-header-text{
     text-align: center;
@@ -74,6 +74,20 @@ color: #101a1a;
     font-weight: 100;
     font-family: "Poppins", sans-serif;
 }
+
+.inner-text{
+    text-align: justify;
+    font-size: 15px;
+    padding-top:30px;
+    padding-left: 20%;
+    padding-right: 20%;
+    padding-bottom: 60px;
+    margin: 0px;
+
+    color: #1b1b1b;
+    font-weight: 600;
+    font-weight: 100;
+  font-family: "Georgia", sans-serif;}
 
 .carousel-container{
     position: relative;
