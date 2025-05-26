@@ -97,6 +97,21 @@ color: #101a1a;
     background: white;
 }
 
+.carousel-img-slide{
+    flex: 0 0 auto;
+    scroll-snap-align: center;
+    width: 800px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: white;
+}
+.carousel-img{
+    width: 800px;     /* or any desired width */
+    height: auto;
+    display: block; 
+}
+
 
 .contributors-container {
     position: relative;
@@ -133,6 +148,7 @@ color: #101a1a;
     font-size: 1.1rem;
     font-weight: bold;
     color: #565656;
+    text-align: center;
 }
 
 
