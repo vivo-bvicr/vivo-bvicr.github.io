@@ -1,0 +1,4 @@
+.contributor img {
+    /* transform-origin: top left; */
+    transform: rotate(90deg);
+}
