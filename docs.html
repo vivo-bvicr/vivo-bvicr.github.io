@@ -29,18 +29,285 @@
     </header>
 
     <div class="section-wrapper">
-
         <div class="section-header">
             <h2 class="section-header-text">Documentation</h2>
         </div>
-        <span style="font-style: italic; color: red;">Working on it ... 
+        <span style="font-style: italic; color: red;">Contents list TBD ... 
         </span>
     </div>
-    <div class="code-block-container">
-        <pre><code id="bibtex">
-    Code ...
-        </code></pre>
+
+    <div class="section-wrapper section1" style="margin-top:50px;padding-bottom: 50px;">
+
+        <div class="section-header">
+            <h2 class="section-header-text">RAW File Organisation </h2>
+            <h3 class="inner-text" style="position:relative;padding: 0px;padding-top:20px; width: 60%; left: 20%; max-width: 800px;">
+                The raw folder structure follows:
+            </h3>
+            <div class="code-block-container">
+                <pre><code id="bibtex" style="white-space: pre;">
+[Scene Name]/
+├──calibration.json
+├──rotation_correction.json # Copy and Paste from <a href="#rot_corr">here</a>
+├──train/
+│   ├──[Camera ID #1]/
+│   │   ├── v1_6_7907_[Camera ID]_depth-image_[Frame ID]_[UTC timestamp].png
+│   │   ├── v1_6_7907_[Camera ID]_depth-image_[Frame ID]_[UTC timestamp].png.meta.json
+│   │   ├── v1_6_7907_[Camera ID]_colour-image_[Frame ID]_[UTC timestamp].jpg
+│   │   ├── v1_6_7907_[Camera ID]_colour-image_[Frame ID]_[UTC timestamp].jpg.meta.json
+│   │   ...
+│   │
+│   ├──[Camera ID #2]/...
+│   ...
+│   └──[Camera ID #10]/...
+│
+└──test/
+    ├──[Camera ID #11]/...
+    ...
+    └──[Camera ID #14]/...
+                </code></pre>    
+            </div>
+            <h3 class="inner-text" style="position:relative;padding: 0px;padding-top:0px; width: 60%; left: 20%;">
+                The train/ and test/ folders follow the same structure. Verify that train/ contains 10x sub-folders and test/ contains
+                4x subfolder. The camera id's are unique so folders can be merged or changed if users wish.
+                <br>
+                <br>
+                The provided files are the depth images (.png), RGB color images (.jpg) and the relevant per-frame meta data for each.
+                <br>
+                <br>
+                Each file name should look like "v1_6_7907_000409113112_colour-image_0000002834_1739289401999071367", where "000409113112" is the camera ID,
+                "0000002834" is the frame number and "1739289401999071367" is the UTC timestamp.
+                <br>
+                <br>
+                Remeber to copy the correct dict <a href="#rot_corr">here</a> to <code>rotation_correction.json</code>                
+            </h3>
+        </div>
     </div>
+
+
+<div class="section-wrapper">
+
+    <div class="section-header">
+        <h2 class="section-header-text">
+              Pre-Processing Data (<code>pre_process.py</code>)
+        </h2>
+        <h3 class="inner-text" style="position:relative;padding: 0px;padding-top:20px; width: 60%; left: 20%; max-width: 800px;">
+            The dataset pre-processing script <code>pre_process.py</code> turns the above RAW file structure into the following file structure 
+            (used for 3-D reconstruction). This script also allows you to undistort color/depth images, generate point clouds and filter point cloud data.
+            Note that [New Scene Name] is provided by you in the GUI, when inseting the destination fp.
+        </h3>
+        <div class="code-block-container">
+            <pre><code id="bibtex" style="white-space: pre;">
+[New Scene Name]/
+├──calibration.json
+├──rotation_correction.json
+├──capture-area.json
+├──train/
+│   ├──[Camera ID #1]/
+│   │   ├──color            # RAW image
+│   │   │    ├──[Frame #1].jpg
+│   │   │    ...
+│   │   │    └──[Frame #300].jpg
+│   │   ├──color_corrected  # undistorted image
+│   │   │    ├──(same as color/)
+│   │   ├──depth            # RAW depth
+│   │   │    ├──[Frame #1].png
+│   │   │    ...
+│   │   │    └──[Frame #300].png
+│   │   ├──depth_corrected  # undistorted depth
+│   │   │    ├──(same as depth/)
+│   │   └──meta
+│   │        ├──[Frame #1].color.json
+│   │        ├──[Frame #1].depth.json
+│   │        ...
+│   │        ├──[Frame #300].color.json
+│   │        └──[Frame #300].depth.json
+│   │
+│   ├──[Camera ID #2]/...
+│   ...
+│   └──[Camera ID #10]/...
+│
+└──test/
+    ├──[Camera ID #11]/...
+    ...
+    └──[Camera ID #14]/...
+            </code></pre>    
+        </div>
+        <h3 class="inner-text" style="position:relative;padding: 0px;padding-top:0px; width: 60%; left: 20%;">
+Various arguments are avaliable to change the window size and set the root directory. Then, by running the following command a GUI will pop up.
+        </h3>
+        <div class="code-block-container">
+            <pre><code id="bibtex" style="white-space: pre;">
+python pre_process.py --root-dir /folder/containing/the/scene/ --session 1/2/3
+            </code></pre>    
+        </div>
+        <h3 class="inner-text" style="position:relative;padding: 0px;padding-top:0px; width: 60%; left: 20%;">
+The video below shows the steps involved in preprocessing the RAW data into the organised data. The additional GUI options provide allow for 
+RGB and depth image undistortion, the choice of sparse or dense or no point cloud and the choice to produce point cloud for frame #1 or for every frame.
+You can also filter the point cloud using a radial distance mask or box filter (if you input the correct Session ID using <code>--session #</code>). The box filter
+will remove all points outisde the staging area (outlined by red tape).
+        </h3>
+        <br>
+    </div>
+</div>
+<div class="video_display">
+    <video controls>
+    <source src="./assets/info/preprocess.webm" type="video/webm">
+    Your browser does not support WebM video.
+    </video>
+</div>
+
+<div class="section-wrapper">
+    <div class="section-header">
+        <h3 class="inner-text" style="position:relative;padding: 0px;padding-top:20px; width: 60%; left: 20%; max-width: 800px;">
+            The dataset pre-processing script <code>pre_process.py</code> turns the above RAW file structure into the following file structure 
+            (used for 3-D reconstruction). This script also allows you to undistort color/depth images, generate point clouds and filter point cloud data.
+            <br>
+            <br>
+            You should be able to automate the point cloud generation and undistortion process using the following Pseudo code as template.
+        </h3>
+        <div class="code-block-container">
+            <pre><code id="bibtex" style="white-space: pre;">
+dataDirectory = '/path/to/folder'
+sceneinfo = [
+    ('Name', Session ID),
+    ('Name', Session ID),
+    ...
+]
+for info in sceneinfo:
+    pcgenerator = Generator(
+        datadir=dataDirectory,
+        settings={
+            "undistort":True, # For undistorting images
+            "pcd":{ # For point cloud generation
+                "sparse":True,
+                "dense":False,
+                "perframe":False,
+                "initial":True,
+                "max_depth": -1., # Use -1 if you do not want to run this 
+                "box_filter":False
+            }
+        },
+        session=info[1]
+    )
+    """ Run the point cloud generator """
+    pcgenerator.run()
+
+    """ Generate video of the point cloud representation """
+    pcgenerator.generate_novel_views()
+            </code></pre>    
+        </div>
+    </div>
+</div>
+<br>
+<br>
+
+<div class="section-wrapper section1">
+
+    <div class="section-header">
+        <h2 class="section-header-text">
+              Mask Generation (<code>mask_gen.py</code>)
+        </h2>
+        <h3 class="inner-text" style="position:relative;padding: 0px;padding-top:20px; width: 60%; left: 20%; max-width: 800px;">
+            The dataset pre-processing script <code>pre_process.py</code> turns the above RAW file structure into the following file structure 
+            (used for 3-D reconstruction). This script also allows you to undistort color/depth images, generate point clouds and filter point cloud data.
+        </h3>
+        <div class="code-block-container">
+            <pre><code id="bibtex" style="white-space: pre;">
+[Scene Name]/
+..
+            </code></pre>    
+        </div>
+        <h3 class="inner-text" style="position:relative;padding: 0px;padding-top:0px; width: 60%; left: 20%;">
+Various arguments are avaliable to change the window size and set the root directory. Then, by running the following command a GUI will pop up.
+        </h3>
+        <div class="code-block-container">
+            <pre><code id="bibtex" style="white-space: pre;">
+python pre_process.py --root-dir /folder/containing/the/scene/ --session 1/2/3
+            </code></pre>    
+        </div>
+        <h3 class="inner-text" style="position:relative;padding: 0px;padding-top:0px; width: 60%; left: 20%;">
+The video below shows the steps involved in preprocessing the RAW data into the organised data. The additional GUI options provide allow for 
+RGB and depth image undistortion, the choice of sparse or dense or no point cloud and the choice to produce point cloud for frame #1 or for every frame.
+You can also filter the point cloud using a radial distance mask or box filter (if you input the correct Session ID using <code>--session #</code>). The box filter
+will remove all points outisde the staging area (outlined by red tape).
+        </h3>
+        <br>
+    </div>
+</div>
+
+
+
+
+<div class="section-wrapper" id="rot_corr">
+
+    <div class="section-header">
+        <h2 class="section-header-text">
+            Select the <code>rotation_correction.json</code> based on the Session ID
+        </h2>
+        <h3 class="inner-text" style="position:relative;padding: 0px;padding-top:20px; width: 60%; left: 20%; max-width: 800px;">
+If you do not know the Session ID for your scene, you can find it in the <a href="catalogue.html">catalogue</a> next to your [Scene Name].
+        </h3>
+
+        <div class="code-block-container">
+            <pre><code id="bibtex" style="white-space: pre;">
+## Copy and Paste on of the following into "[Scene Name]/rotation_correction.json" ##
+# For Session 1:
+{
+	"000809414712":-1,
+	"000875114712":1,
+	"000906614712":1,
+	"000950714712":-1,
+	"000236320812":1,
+	"000404613112":1,
+	"000409113112":1,
+	"000454921912":-1,
+	"000469213112":-1,
+	"000558313112":-1,
+	"000582921912":-1,
+	"000594313112":-1,
+	"000639313112":1,
+	"000951614712":1
+}
+# For Session 2:
+{
+    "000809414712":-1,
+    "000875114712":1,
+    "000906614712":1,
+    "000950714712":-1,
+    "000236320812":1,
+    "000404613112":1,
+    "000409113112":1,
+    "000454921912":-1,
+    "000469213112":-1,
+    "000558313112":-1,
+    "000582921912":-1,
+    "000639313112":1,
+    "000951614712":1,
+    "000594313112":-1
+}
+
+# For Session 3:
+{
+    "000497113112":1,
+    "000499613112":-1,
+    "000511713112":1,
+    "000516213112":1,
+    "000236320812":1,
+    "000404613112":1,
+    "000409113112":1,
+    "000454921912":-1,
+    "000469213112":-1,
+    "000558313112":-1,
+    "000582921912":-1,
+    "000639313112":1,
+    "000951614712":1,
+    "000594313112":-1
+}
+            </code></pre>    
+        </div>
+    </div>
+</div>
+
 
 
     </body>

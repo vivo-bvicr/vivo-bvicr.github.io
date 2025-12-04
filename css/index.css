@@ -201,3 +201,10 @@ color: #101a1a;
 .copy-button:hover {
     background-color: #0056b3;
 }
+
+
+.video_display{
+    position: relative;
+    width: 60%;
+    left:20%;
+}
