@@ -28,23 +28,67 @@
         </nav>
     </header>
 
-    <div class="section-wrapper">
-        <div class="section-header">
-            <h2 class="section-header-text">Documentation</h2>
-        </div>
-        <span style="font-style: italic; color: red;">Contents list TBD ... 
-        </span>
+    
+<div class="section-wrapper">
+    <div class="section-header">
+        <h2 class="section-header-text">Documentation</h2>
     </div>
+    <h3 class="inner-text" style="position:relative;padding: 0px;padding-top:20px; width: 60%; left: 20%; max-width: 800px;">
+The documetation on this page outlines the steps involved in organising the dataset, processing undistortion, generating and filtering
+the point cloud data and generating the masks. The following outlines the steps involved in generating the dataset we used for the NVS
+tasks in the paper: 
+    <ul style="position:relative;padding: 0px;padding-top:20px; width: 60%; left: 20%; max-width: 800px;list-style-type: none;">
+        <li><a href="#introduction">1. Install python & conda environment</a></li>
+        <li><a href="#raw">2. RAW file organisation</a></li>
+        <li><a href="#preproc">3. Pre-process RGB, depth and meta data</a></li>
+        <li><a style="margin-left: 30px;">a. Copy and organise data</a></li>
+        <li><a style="margin-left: 30px;">b. Select point cloud generation settings</a></li>
+        <li><a href="#genmasks">4. Generate Masks using SAM2</a></li>
+        <li><a style="margin-left: 30px;">a. Install SAM2 & checkpoints</a></li>
+        <li><a style="margin-left: 30px;">b. Generate masks per camera</a></li>
 
-    <div class="section-wrapper section1" style="margin-top:50px;padding-bottom: 50px;">
+    </ul>
+    <br>
+You should have downloaded a <code>Scene Name</code> and have a <code>Scene ID</code> (e.g. for <code>Scene Name = athlete_row</code> the 
+ID is <code>3</code>). These refer to the capture sessions, e.g. all scene using Scene ID 1 were captured on the same day.
+    </h3>
+</div>
 
-        <div class="section-header">
-            <h2 class="section-header-text">RAW File Organisation </h2>
-            <h3 class="inner-text" style="position:relative;padding: 0px;padding-top:20px; width: 60%; left: 20%; max-width: 800px;">
-                The raw folder structure follows:
-            </h3>
-            <div class="code-block-container">
-                <pre><code id="bibtex" style="white-space: pre;">
+<div class="section-wrapper" id="introduction">
+    <div class="section-header">
+        <h2 class="section-header-text" style="font-size: 25px;">Code & Environment Installation</h2>
+    </div>
+    <h3 class="inner-text" style="position:relative;padding: 0px;padding-top:20px; width: 60%; left: 20%; max-width: 800px;">
+To install the code repository and conda environment. Follow the steps bellow.
+        </h3>
+        <div class="code-block-container">
+            <pre><code id="bibtex" style="white-space: pre;">
+# Clone and enter data processing reposiory
+git clone https://github.com/azzarelli/dataproc.git
+cd dataproc
+
+# Create base conda env
+conda create -n vivo python=3.10 -y
+conda activate vivo
+
+# Install Pytorch <a href="https://pytorch.org/get-started/locally/">(remember to change the torch & cuda tags for your system)</a>
+pip3 install torch torchvision
+
+# Install requirements
+pip install -r requirements.txt
+            </code></pre>    
+        </div>
+</div>
+
+<div class="section-wrapper section1" id="raw" style="margin-top:50px;padding-bottom: 50px;">
+
+    <div class="section-header">
+        <h2 class="section-header-text">RAW File Organisation </h2>
+        <h3 class="inner-text" style="position:relative;padding: 0px;padding-top:20px; width: 60%; left: 20%; max-width: 800px;">
+            The raw folder structure follows:
+        </h3>
+        <div class="code-block-container">
+            <pre><code id="bibtex" style="white-space: pre;">
 [Scene Name]/
 ├──calibration.json
 ├──rotation_correction.json # Copy and Paste from <a href="#rot_corr">here</a>
@@ -64,27 +108,26 @@
     ├──[Camera ID #11]/...
     ...
     └──[Camera ID #14]/...
-                </code></pre>    
-            </div>
-            <h3 class="inner-text" style="position:relative;padding: 0px;padding-top:0px; width: 60%; left: 20%;">
-                The train/ and test/ folders follow the same structure. Verify that train/ contains 10x sub-folders and test/ contains
-                4x subfolder. The camera id's are unique so folders can be merged or changed if users wish.
-                <br>
-                <br>
-                The provided files are the depth images (.png), RGB color images (.jpg) and the relevant per-frame meta data for each.
-                <br>
-                <br>
-                Each file name should look like "v1_6_7907_000409113112_colour-image_0000002834_1739289401999071367", where "000409113112" is the camera ID,
-                "0000002834" is the frame number and "1739289401999071367" is the UTC timestamp.
-                <br>
-                <br>
-                Remeber to copy the correct dict <a href="#rot_corr">here</a> to <code>rotation_correction.json</code>                
-            </h3>
+            </code></pre>    
         </div>
+        <h3 class="inner-text" style="position:relative;padding: 0px;padding-top:0px; width: 60%; left: 20%;">
+            The train/ and test/ folders follow the same structure. Verify that train/ contains 10x sub-folders and test/ contains
+            4x subfolder. The camera id's are unique so folders can be merged or changed if users wish.
+            <br>
+            <br>
+            The provided files are the depth images (.png), RGB color images (.jpg) and the relevant per-frame meta data for each.
+            <br>
+            <br>
+            Each file name should look like "v1_6_7907_000409113112_colour-image_0000002834_1739289401999071367", where "000409113112" is the camera ID,
+            "0000002834" is the frame number and "1739289401999071367" is the UTC timestamp.
+            <br>
+            <br>
+            Remeber to copy the correct dict <a href="#rot_corr">here</a> to <code>rotation_correction.json</code>                
+        </h3>
     </div>
+</div>
 
-
-<div class="section-wrapper">
+<div class="section-wrapper" id="preproc">
 
     <div class="section-header">
         <h2 class="section-header-text">
@@ -201,42 +244,80 @@ for info in sceneinfo:
 <br>
 <br>
 
-<div class="section-wrapper section1">
+<div class="section-wrapper section1" id="genmasks">
 
     <div class="section-header">
         <h2 class="section-header-text">
               Mask Generation (<code>mask_gen.py</code>)
         </h2>
         <h3 class="inner-text" style="position:relative;padding: 0px;padding-top:20px; width: 60%; left: 20%; max-width: 800px;">
-            The dataset pre-processing script <code>pre_process.py</code> turns the above RAW file structure into the following file structure 
-            (used for 3-D reconstruction). This script also allows you to undistort color/depth images, generate point clouds and filter point cloud data.
+This interface works with SAM2. You can install the additional environment variables using the following code. Please visit the official <a href="https://github.com/facebookresearch/sam2">SAM2 repository</a> for
+information or help on SAM2-related issues. After downloading the checkpoints and configurations files we will be ready to generate masks.
         </h3>
         <div class="code-block-container">
             <pre><code id="bibtex" style="white-space: pre;">
-[Scene Name]/
-..
+# Make the extended utilities folder
+mkdir utils_ext
+cd utils_ext
+
+# Clone SAM2 
+git clone https://github.com/facebookresearch/sam2.git
+cd sam2
+
+# Install SAM2 environment for more information see the <a href="https://github.com/facebookresearch/sam2">SAM2 repository</a>.
+pip install -e .
+
+# Download SAM2 checkpoints and configuration files
+cd ../../
+mkdir checkpoints && mkdir configs
+
+cd checkpoints
+>>> download for example 'sam2.1_hiera_large.pt' (this checkpoint works comfortably with an RTX 3090 GPU) and copy it into this folder
+
+cd ../configs
+mkdir sam2.1 && cd sam2.1
+>>> download for example 'sam2.1_hiera_l.yaml'
+
+# Go to main code (top-level) & run mask_gen.py
+cd ../
+python mask_gen.py
             </code></pre>    
         </div>
         <h3 class="inner-text" style="position:relative;padding: 0px;padding-top:0px; width: 60%; left: 20%;">
-Various arguments are avaliable to change the window size and set the root directory. Then, by running the following command a GUI will pop up.
+The video below shows the steps involved in applying the mask to each image and frame. Input the target folder, then select the camera you want to
+generate masks for. You can also select a specific frame to mask. We suggest starting with frame 0 and refining the mask if the propagated
+SAM2 mask produces incorrect rest.
+<br>
+<br>
+1. When you are aready, initialize SAM2. 
+<br>
+<br>
+2. Once the model has loaded, click on the image where you want to add <i>positive</i> prompts. 
+<br>
+<br>
+3. Then hit <code>Set Masks</code>. 
+<br>
+<span style="margin-left: 30px;">a. Once the masks have generated, you can add more positive prompts to refine the mask. </span>
+<br>
+<span style="margin-left: 30px;">b. You can also click <code>Set Pos/Neg</code> to switch to using <i>negative</i> prompts. </span>
+<br>
+<span style="margin-left: 30px;">c. You can also click <code>Reset Prompt</code> to reset the SAM2 prompts.</span>
+<br>
+<br>
+4. Once you are happy, hit <code>Propagate and Save</code>. When this is done you can move on to other cameras in the GUI.
         </h3>
-        <div class="code-block-container">
-            <pre><code id="bibtex" style="white-space: pre;">
-python pre_process.py --root-dir /folder/containing/the/scene/ --session 1/2/3
-            </code></pre>    
-        </div>
-        <h3 class="inner-text" style="position:relative;padding: 0px;padding-top:0px; width: 60%; left: 20%;">
-The video below shows the steps involved in preprocessing the RAW data into the organised data. The additional GUI options provide allow for 
-RGB and depth image undistortion, the choice of sparse or dense or no point cloud and the choice to produce point cloud for frame #1 or for every frame.
-You can also filter the point cloud using a radial distance mask or box filter (if you input the correct Session ID using <code>--session #</code>). The box filter
-will remove all points outisde the staging area (outlined by red tape).
-        </h3>
-        <br>
+<br>
     </div>
+    <div class="video_display">
+    <video controls>
+        <source src="./assets/info/mask_gen.webm" type="video/webm">
+        Your browser does not support WebM video.
+        </video>
+    </div>
+    <br>
+    <br>
+    <br>
 </div>
-
-
-
 
 <div class="section-wrapper" id="rot_corr">
 
